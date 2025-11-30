@@ -203,7 +203,6 @@ SIMPLE_JWT = {
 }
 
 # CORS Configuration
-]
 CORS_ALLOWED_ORIGINS = config(
     'CORS_ALLOWED_ORIGINS',
     default='https://movie-recommendation-app-frontend-f2s1ni2g6.vercel.app',
