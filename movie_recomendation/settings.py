@@ -81,8 +81,12 @@ WSGI_APPLICATION = 'movie_recomendation.wsgi.application'
 DATABASE_URL = config('DATABASE_URL', default=None)
 
 if DATABASE_URL:
+    # Ensure the URL starts with postgres:// or postgresql://
+    if DATABASE_URL.startswith('postgres://'):
+        DATABASE_URL = DATABASE_URL.replace('postgres://', 'postgresql://', 1)
+
     DATABASES = {
-        'default': dj_database_url.parse(DATABASE_URL)
+        'default': dj_database_url.parse(DATABASE_URL, conn_max_age=600)
     }
 else:
     DB_ENGINE = config('DB_ENGINE', default='django.db.backends.postgresql')
