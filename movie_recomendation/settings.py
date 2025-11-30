@@ -203,20 +203,6 @@ SIMPLE_JWT = {
 }
 
 # CORS Configuration
-CORS_ALLOWED_ORIGINS = [
-    "http://localhost:8080",
-    "http://localhost:8000",
-    "http://localhost:3000",
-    "https://movie-recommendation-app-frontend-f2s1ni2g6.vercel.app",
-    "https://movie-recommendation-app-uskd.onrender.com",
-]
-CSRF_TRUSTED_ORIGINS = [
-    "http://127.0.0.1:8000",
-    "http://localhost:8000",
-    "https://movie-recommendation-app-uskd.onrender.com",
-    "http://localhost:3000",
-    "http://localhost:8080",
-    "https://movie-recommendation-app-frontend-f2s1ni2g6.vercel.app",
 ]
 CORS_ALLOWED_ORIGINS = config(
     'CORS_ALLOWED_ORIGINS',
