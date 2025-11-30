@@ -1,0 +1,37 @@
+services:
+  # Django Web Service
+  - type: web
+    name: movie-recommendation-api
+    runtime: python
+    buildCommand: "./build.sh"
+    startCommand: "gunicorn movie_recomendation.wsgi:application"
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.11
+      - key: SECRET_KEY
+        generateValue: true
+      - key: DEBUG
+        value: false
+      - key: DB_ENGINE
+        value: django.db.backends.postgresql
+      - key: DATABASE_URL
+        fromDatabase:
+          name: movie-recommendation-db
+          property: connectionString
+      - key: REDIS_URL
+        fromService:
+          type: redis
+          name: movie-recommendation-redis
+          property: connectionString
+
+  # PostgreSQL Database
+databases:
+  - name: movie-recommendation-db
+    databaseName: movie_recommendation_db
+    user: movie_rec_user
+
+  # Redis Cache
+  - name: movie-recommendation-redis
+    type: redis
+    plan: starter
+    maxmemoryPolicy: allkeys-lru
