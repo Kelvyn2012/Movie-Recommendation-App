@@ -61,15 +61,17 @@ This API uses JWT (JSON Web Tokens) for authentication. To access protected endp
     permission_classes=(permissions.AllowAny,),
 )
 
+from movies import urls as movies_urls
+
 urlpatterns = [
     path('admin/', admin.site.urls),
 
     # API endpoints
     path('api/auth/', include('users.urls')),
     path('api/movies/', include('movies.urls')),
-    path('api/users/favorites/', include(('movies.urls', 'favorites'), namespace='favorites')),
-    path('api/users/ratings/', include(('movies.urls', 'ratings'), namespace='ratings')),
-    path('api/users/watchlist/', include(('movies.urls', 'watchlist'), namespace='watchlist')),
+    path('api/users/favorites/', include(movies_urls.favorites_urlpatterns)),
+    path('api/users/ratings/', include(movies_urls.ratings_urlpatterns)),
+    path('api/users/watchlist/', include(movies_urls.watchlist_urlpatterns)),
 
     # API Documentation
     path('api/docs/', schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),
