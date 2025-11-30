@@ -205,13 +205,13 @@ SIMPLE_JWT = {
 # CORS Configuration
 CORS_ALLOWED_ORIGINS = config(
     'CORS_ALLOWED_ORIGINS',
-    default='https://movie-recommendation-app-frontend-6mq6xi4az.vercel.app/,http://localhost:3000,http://localhost:8000',
+    default='https://movie-recommendation-app-frontend-6mq6xi4az.vercel.app/',
     cast=Csv()
 )
 CORS_ALLOW_CREDENTIALS = True
 
 # Redis Configuration
-# Check if REDIS_URL is provided (Render deployment)
+# Check if REDIS_URL is provided (Render deployment)S
 REDIS_URL = config('REDIS_URL', default=None)
 
 if REDIS_URL:
