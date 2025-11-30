@@ -64,7 +64,12 @@ def batch_create_movies_from_tmdb(movie_list: list) -> list:
             except ValueError:
                 pass
 
-        genres = [{'id': g['id'], 'name': g['name']} for g in movie_data.get('genre_ids', [])]
+        # TMDb returns genre_ids as a list of integers in trending/search results
+        genre_ids = movie_data.get('genre_ids', [])
+        if genre_ids and isinstance(genre_ids[0], int):
+            genres = [{'id': gid} for gid in genre_ids]
+        else:
+            genres = [{'id': g['id'], 'name': g.get('name', '')} for g in genre_ids]
 
         movie, _ = Movie.objects.update_or_create(
             tmdb_id=movie_data['id'],
