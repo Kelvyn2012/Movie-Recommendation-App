@@ -111,7 +111,7 @@ movie_recomendation/
 ### 1. Clone the Repository
 
 ```bash
-git clone <repository-url>
+git clone git@github.com:Kelvyn2012/Movie-Recommendation-App.git
 cd movie_recomendation
 ```
 
