@@ -72,25 +72,32 @@ class RecommendationService:
             FavoriteMovie.objects.filter(user=self.user).values_list('movie_id', flat=True)
         )
 
-        movies = Movie.objects.filter(
-            genres__contains=[{'id': genre_id} for genre_id in genre_ids]
-        ).exclude(
-            id__in=exclude_movie_ids
-        ).order_by('-vote_average', '-popularity')[:limit]
+        # Filter movies that have any of the favorite genres
+        # Since SQLite doesn't support JSON contains, we filter in Python
+        all_movies = Movie.objects.exclude(id__in=exclude_movie_ids).order_by('-vote_average', '-popularity')
 
-        if movies.count() < limit // 2:
+        matching_movies = []
+        for movie in all_movies:
+            if any(genre.get('id') in genre_ids for genre in movie.genres if isinstance(genre, dict)):
+                matching_movies.append(movie)
+                if len(matching_movies) >= limit:
+                    break
+
+        if len(matching_movies) < limit // 2:
             tmdb_results = tmdb_service.discover_movies(
-                with_genres=','.join(map(str, genre_ids)),
-                sort_by='vote_average.desc',
-                'vote_count.gte': 100,
-                page=1
+                **{
+                    'with_genres': ','.join(map(str, genre_ids)),
+                    'sort_by': 'vote_average.desc',
+                    'vote_count.gte': 100,
+                    'page': 1
+                }
             )
 
             if tmdb_results and tmdb_results.get('results'):
                 tmdb_movies = batch_create_movies_from_tmdb(tmdb_results['results'])
-                movies = list(movies) + tmdb_movies
+                matching_movies = list(matching_movies) + tmdb_movies
 
-        return list(movies)[:limit]
+        return matching_movies[:limit]
 
     def _get_popular_movies(self, limit: int) -> List[Movie]:
         movies = Movie.objects.order_by('-popularity', '-vote_average')[:limit]
