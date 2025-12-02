@@ -55,8 +55,19 @@ def create_movie_from_tmdb_data(movie_data: dict) -> Movie:
 
 
 def batch_create_movies_from_tmdb(movie_list: list) -> list:
-    movies = []
+    if not movie_list:
+        return []
+
+    # Extract TMDb IDs to check which movies already exist
+    tmdb_ids = [movie_data['id'] for movie_data in movie_list]
+    existing_movies = {movie.tmdb_id: movie for movie in Movie.objects.filter(tmdb_id__in=tmdb_ids)}
+
+    movies_to_create = []
+    movies_to_update = []
+    all_movies = []
+
     for movie_data in movie_list:
+        tmdb_id = movie_data['id']
         release_date = None
         if movie_data.get('release_date'):
             try:
@@ -71,23 +82,45 @@ def batch_create_movies_from_tmdb(movie_list: list) -> list:
         else:
             genres = [{'id': g['id'], 'name': g.get('name', '')} for g in genre_ids]
 
-        movie, _ = Movie.objects.update_or_create(
-            tmdb_id=movie_data['id'],
-            defaults={
-                'title': movie_data.get('title', ''),
-                'original_title': movie_data.get('original_title', ''),
-                'overview': movie_data.get('overview', ''),
-                'poster_path': movie_data.get('poster_path', ''),
-                'backdrop_path': movie_data.get('backdrop_path', ''),
-                'release_date': release_date,
-                'vote_average': movie_data.get('vote_average', 0.0),
-                'vote_count': movie_data.get('vote_count', 0),
-                'popularity': movie_data.get('popularity', 0.0),
-                'genres': genres,
-                'original_language': movie_data.get('original_language', ''),
-                'adult': movie_data.get('adult', False),
-            }
-        )
-        movies.append(movie)
+        movie_defaults = {
+            'title': movie_data.get('title', ''),
+            'original_title': movie_data.get('original_title', ''),
+            'overview': movie_data.get('overview', ''),
+            'poster_path': movie_data.get('poster_path', ''),
+            'backdrop_path': movie_data.get('backdrop_path', ''),
+            'release_date': release_date,
+            'vote_average': movie_data.get('vote_average', 0.0),
+            'vote_count': movie_data.get('vote_count', 0),
+            'popularity': movie_data.get('popularity', 0.0),
+            'genres': genres,
+            'original_language': movie_data.get('original_language', ''),
+            'adult': movie_data.get('adult', False),
+        }
 
-    return movies
+        if tmdb_id in existing_movies:
+            # Update existing movie
+            movie = existing_movies[tmdb_id]
+            for field, value in movie_defaults.items():
+                setattr(movie, field, value)
+            movies_to_update.append(movie)
+            all_movies.append(movie)
+        else:
+            # Create new movie
+            movie = Movie(tmdb_id=tmdb_id, **movie_defaults)
+            movies_to_create.append(movie)
+            all_movies.append(movie)
+
+    # Bulk create new movies
+    if movies_to_create:
+        Movie.objects.bulk_create(movies_to_create, ignore_conflicts=True)
+
+    # Bulk update existing movies
+    if movies_to_update:
+        Movie.objects.bulk_update(
+            movies_to_update,
+            ['title', 'original_title', 'overview', 'poster_path', 'backdrop_path',
+             'release_date', 'vote_average', 'vote_count', 'popularity', 'genres',
+             'original_language', 'adult']
+        )
+
+    return all_movies
