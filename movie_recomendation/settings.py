@@ -16,12 +16,11 @@ SECRET_KEY = config('SECRET_KEY', default='django-insecure-g&&&lls*dnv_uz57)!(&^
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = config('DEBUG', default=True, cast=bool)
 
-ALLOWED_HOSTS = [
-    'localhost',
-    '127.0.0.1',
-    '.onrender.com',
-    'movie-recommendation-app-uskd.onrender.com',
-]
+ALLOWED_HOSTS = config(
+    'ALLOWED_HOSTS',
+    default='localhost,127.0.0.1,.onrender.com,movie-recommendation-app-uskd.onrender.com',
+    cast=Csv()
+)
 
 
 # Application definition
@@ -210,13 +209,13 @@ SIMPLE_JWT = {
 # CORS Configuration
 CORS_ALLOWED_ORIGINS = config(
     'CORS_ALLOWED_ORIGINS',
-    default='https://movie-recommendation-app-frontend-f2s1ni2g6.vercel.app',
+    default='http://localhost:3000,https://movie-recommendation-app-frontend-nu.vercel.app',
     cast=Csv()
 )
 CORS_ALLOW_CREDENTIALS = True
 
 # Redis Configuration
-# Check if REDIS_URL is provided (Render deployment)S
+# Check if REDIS_URL is provided (Render deployment)
 REDIS_URL = config('REDIS_URL', default=None)
 
 if REDIS_URL:
