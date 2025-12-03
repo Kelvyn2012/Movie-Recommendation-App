@@ -16,7 +16,7 @@ inflection==0.5.1
 iniconfig==2.3.0
 packaging==25.0
 pluggy==1.6.0
-psycopg2==2.9.11
+psycopg2-binary==2.9.11
 PyJWT==2.10.1
 pytest==7.4.3
 pytest-django==4.7.0
@@ -29,3 +29,4 @@ setuptools==80.9.0
 sqlparse==0.5.4
 uritemplate==4.2.0
 urllib3==2.5.0
+whitenoise==6.11.0
