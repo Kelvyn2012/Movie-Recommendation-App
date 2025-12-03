@@ -85,7 +85,7 @@ class FavoriteMovieSerializer(serializers.ModelSerializer):
 
 class UserRatingSerializer(serializers.ModelSerializer):
     movie = MovieSerializer(read_only=True)
-    tmdb_id = serializers.IntegerField(write_only=True, required=False)
+    tmdb_id = serializers.IntegerField(write_only=True, required=True)
 
     class Meta:
         model = UserRating
